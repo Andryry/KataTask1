@@ -10,9 +10,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class UserDaoHibernateImpl implements UserDao {
     private static final SessionFactory factory;
@@ -37,10 +35,7 @@ public class UserDaoHibernateImpl implements UserDao {
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                     .applySettings(configuration.getProperties())
                     .build();
-
             factory = configuration.buildSessionFactory(serviceRegistry);
-
-
         }
         catch (Throwable e){
             throw new ExceptionInInitializerError(e);
@@ -48,9 +43,7 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
 
-
     public UserDaoHibernateImpl() {
-
     }
 
 
@@ -64,9 +57,7 @@ public class UserDaoHibernateImpl implements UserDao {
                 "age TINYINT)";
         try (Session session = factory.openSession()){
             transaction = session.beginTransaction();
-
             session.createNativeQuery(sql).executeUpdate();
-
             transaction.commit();
         }
         catch (Exception e){
@@ -81,12 +72,11 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void dropUsersTable() {
         Transaction transaction = null;
-        String sqlQuerry = "DROP TABLE IF EXISTS users";
-
+        String sqlQuery = "Drop TABLE IF EXISTS Users";
         try (Session session = factory.openSession()){
             transaction = session.beginTransaction();
 
-            session.createNativeQuery(sqlQuerry).executeUpdate();
+            session.createSQLQuery(sqlQuery).executeUpdate();
 
             transaction.commit();
         }
@@ -142,14 +132,11 @@ catch (Exception e){
     @Override
     public List<User> getAllUsers() {
         Transaction transaction = null;
-        List <User> userList = new ArrayList<>();
-
         try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
-            Query<User> userQuery = session.createQuery("from jm.task.core.jdbc.model.User", User.class);
-            userList = userQuery.getResultList();
-
+            List <User> userList = session.createQuery("from jm.task.core.jdbc.model.User", User.class).getResultList();
             transaction.commit();
+            return userList;
         }
         catch (Exception e) {
         if (transaction != null && transaction.isActive()) {
@@ -157,7 +144,7 @@ catch (Exception e){
         }
         e.printStackTrace();}
 
-        return userList;
+        return Collections.emptyList();
     }
 
     @Override
@@ -165,11 +152,9 @@ catch (Exception e){
 
         Transaction transaction = null;
         try (Session session = factory.openSession()){
-
             transaction = session.beginTransaction();
             session.createNativeQuery("TRUNCATE TABLE users").executeUpdate();
             transaction.commit();
-
         }
         catch (Exception e){
             if (transaction!=null&& transaction.isActive()){
