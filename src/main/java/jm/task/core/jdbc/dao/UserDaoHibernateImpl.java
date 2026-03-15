@@ -21,7 +21,7 @@ public class UserDaoHibernateImpl implements UserDao {
             properties.put(Environment.URL, "jdbc:mysql://localhost:3306/test_db_one");
             properties.put(Environment.USER, "jpauser");
             properties.put(Environment.PASS, "jpapwd");
-            properties.put(Environment.DRIVER,"com.mysql.cj.jdbc.Driver");
+            properties.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
 
             properties.put(Environment.SHOW_SQL, "true");
             properties.put(Environment.FORMAT_SQL, "true");
@@ -36,8 +36,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     .applySettings(configuration.getProperties())
                     .build();
             factory = configuration.buildSessionFactory(serviceRegistry);
-        }
-        catch (Throwable e){
+        } catch (Throwable e) {
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -55,13 +54,12 @@ public class UserDaoHibernateImpl implements UserDao {
                 "name VARCHAR(255), " +
                 "lastName VARCHAR(255), " +
                 "age TINYINT)";
-        try (Session session = factory.openSession()){
+        try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
             session.createNativeQuery(sql).executeUpdate();
             transaction.commit();
-        }
-        catch (Exception e){
-            if (transaction != null && transaction.isActive()){
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
             e.printStackTrace();
@@ -73,15 +71,12 @@ public class UserDaoHibernateImpl implements UserDao {
     public void dropUsersTable() {
         Transaction transaction = null;
         String sqlQuery = "Drop TABLE IF EXISTS Users";
-        try (Session session = factory.openSession()){
+        try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
-
             session.createSQLQuery(sqlQuery).executeUpdate();
-
             transaction.commit();
-        }
-        catch (Exception e) {
-            if (transaction!=null&&transaction.isActive()){
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
                 e.printStackTrace();
             }
@@ -92,15 +87,13 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Transaction transaction = null;
-        User user = new User(name,lastName,age);
-
-        try (Session session = factory.openSession()){
+        User user = new User(name, lastName, age);
+        try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
             session.persist(user);
             transaction.commit();
-        }
-        catch (Exception e){
-            if (transaction!= null&& transaction.isActive()) {
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
                 e.printStackTrace();
             }
@@ -109,24 +102,20 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void removeUserById(long id) {
-Transaction transaction = null;
-User user = null;
-
-try (Session session = factory.openSession()) {
-    transaction = session.beginTransaction();
-
-    user = session.get(User.class,id);
-    if (user!=null) {
-        session.remove(user);
-    }
-    transaction.commit();
-}
-catch (Exception e){
-    if (transaction!= null && transaction.isActive()) {
-        transaction.rollback();
-        e.printStackTrace();
-    }
-}
+        Transaction transaction = null;
+        try (Session session = factory.openSession()) {
+            transaction = session.beginTransaction();
+            User user = session.get(User.class, id);
+            if (user != null) {
+                session.remove(user);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -134,16 +123,15 @@ catch (Exception e){
         Transaction transaction = null;
         try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
-            List <User> userList = session.createQuery("from jm.task.core.jdbc.model.User", User.class).getResultList();
+            List<User> userList = session.createQuery("from jm.task.core.jdbc.model.User", User.class).getResultList();
             transaction.commit();
             return userList;
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
         }
-        catch (Exception e) {
-        if (transaction != null && transaction.isActive()) {
-            transaction.rollback();
-        }
-        e.printStackTrace();}
-
         return Collections.emptyList();
     }
 
@@ -151,19 +139,15 @@ catch (Exception e){
     public void cleanUsersTable() {
 
         Transaction transaction = null;
-        try (Session session = factory.openSession()){
+        try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
             session.createNativeQuery("TRUNCATE TABLE users").executeUpdate();
             transaction.commit();
-        }
-        catch (Exception e){
-            if (transaction!=null&& transaction.isActive()){
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
                 e.printStackTrace();
             }
         }
-
-
-
     }
 }
