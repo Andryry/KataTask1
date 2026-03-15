@@ -27,7 +27,7 @@ public class UserDaoJDBCImpl implements UserDao {
         try (PreparedStatement preparedStatement = Util.getNewConnection().prepareStatement(createTableSQL)) {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 
@@ -48,9 +48,9 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.setString(2,lastName);
             preparedStatement.setByte(3,age);
             preparedStatement.executeUpdate();
-            System.out.printf("User с именем %S добавлен в таблицу\n", name);
+            System.out.println("User с именем – " + name + " добавлен в базу данных");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 
@@ -58,8 +58,9 @@ public class UserDaoJDBCImpl implements UserDao {
         String removeUserByIdNow = ("DELETE from studentes where id = ?");
         try (PreparedStatement preparedStatement = Util.getNewConnection().prepareStatement(removeUserByIdNow)){
             preparedStatement.setLong(1,id);
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 
@@ -78,7 +79,7 @@ public class UserDaoJDBCImpl implements UserDao {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
         return usersList;
     }
@@ -88,7 +89,7 @@ public class UserDaoJDBCImpl implements UserDao {
         try (PreparedStatement preparedStatement = Util.getNewConnection().prepareStatement(cleanTable)) {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 }
